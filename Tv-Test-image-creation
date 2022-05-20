@@ -1,0 +1,152 @@
+
+#include <stdio.h> // for printf
+#include <conio.h> // for getch
+
+#include <iostream> // for cin cout
+#include <fstream>  // For file IO
+using namespace std; // Explain some day 
+
+// This needed to do Math calculations
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+// BMP Library
+#include "ImProcInPlainC.h"
+
+void CreateGrayRectangle(unsigned char image[][NUMBER_OF_COLUMNS])
+{
+	for (int row = 0; row < NUMBER_OF_ROWS; row++)
+	{
+		for (int column = 0; column < NUMBER_OF_COLUMNS; column++)
+		{
+			image[row][column] = 50;
+		}
+	}
+
+	for (int row = NUMBER_OF_ROWS * 1 / 4; row < NUMBER_OF_ROWS * 3 / 4; row++)
+	{
+		for (int column = NUMBER_OF_COLUMNS * 1 / 4; column < NUMBER_OF_COLUMNS * 3 / 4; column++)
+		{
+			image[row][column] = 200;
+		}
+	}
+}
+
+void CreateGrayRamp(unsigned char image[][NUMBER_OF_COLUMNS])
+{
+	for (int row = 0; row < NUMBER_OF_ROWS; row++)
+	{
+		for (int column = 0; column < NUMBER_OF_COLUMNS; column++)
+		{
+			image[row][column] = 5*column;
+		}
+	}
+}
+
+void AddGrayRectangle(unsigned char img[][NUMBER_OF_COLUMNS], int width, int height, int top, int left, unsigned char transparency, unsigned char grayLevel)
+{
+
+
+	for (int row=top;(( row < top + height) && (row <NUMBER_OF_ROWS)); row++)
+	{
+
+		for (int column =left; column < left+width && column<NUMBER_OF_COLUMNS; column++)
+		{
+			img[row][column] = transparency*(img[row][column]/255.0)+(255-transparency)*grayLevel/255.0;
+		}
+
+	}
+}
+
+void CreateGrayimage(unsigned char image[][NUMBER_OF_COLUMNS])
+{
+	for (int row = 0; row < NUMBER_OF_ROWS; row++)
+	{
+		for (int column = 0; column < NUMBER_OF_COLUMNS; column++)
+		{
+			image[row][column] = 180;
+		}
+	}
+
+}
+
+
+void CreateTVtestImage(unsigned char image[][NUMBER_OF_COLUMNS]) {
+
+	AddGrayRectangle(image, 320, 240, 0, 0, 0, 140); //Adding a gray background
+
+	////Makes the left-down section.
+	AddGrayRectangle(image, 35, 30, 0, 0, 0, 0);
+	AddGrayRectangle(image, 14, 12, 9, 10, 0, 255);
+	AddGrayRectangle(image, 19, 19, 0, 35, 0, 85);
+	AddGrayRectangle(image, 19, 19, 0, 54, 0, 68);
+	AddGrayRectangle(image, 19, 19, 30, 7, 0, 102);
+	AddGrayRectangle(image, 19, 19, 49, 7, 0, 119);
+
+	////Makes the left-up section.
+	AddGrayRectangle(image, 35, 30, 0, 285, 0, 0);
+	AddGrayRectangle(image, 14, 12, 9, 295, 0, 255);
+	AddGrayRectangle(image, 19, 19, 191, 7, 0, 183);
+	AddGrayRectangle(image, 19, 19, 173, 7, 0, 166);
+	AddGrayRectangle(image, 19, 19, 220, 36, 0, 200);
+	AddGrayRectangle(image, 19, 19, 220, 55, 0, 217);
+
+
+	////Makes the right-up section.
+
+	AddGrayRectangle(image, 35, 30, 210, 285, 0, 0);
+	AddGrayRectangle(image, 14, 12, 219, 295, 0, 255);
+	AddGrayRectangle(image, 19, 19, 221, 265, 0, 221);
+	AddGrayRectangle(image, 19, 19, 221, 247, 0, 204);
+	AddGrayRectangle(image, 19, 19, 191, 293, 0, 238);
+	AddGrayRectangle(image, 19, 19, 173, 293, 0, 255);
+
+	////Makes the right-down section.
+
+	AddGrayRectangle(image, 35, 30, 210, 0, 0, 0);
+	AddGrayRectangle(image, 14, 12, 219, 10, 0, 255);
+	AddGrayRectangle(image, 19, 19, 30, 293, 0, 68);
+	AddGrayRectangle(image, 19, 19, 49, 293, 0, 0);
+	AddGrayRectangle(image, 19, 19, 0, 266, 0, 84);
+	AddGrayRectangle(image, 19, 19, 0, 247, 0, 101);
+
+	for (int row = 0; row < NUMBER_OF_ROWS; row++)
+	{
+		for (int column = 0; column < NUMBER_OF_COLUMNS; column++)
+		{
+			int pixY = row - (NUMBER_OF_ROWS / 2);
+			int pixX = column - (NUMBER_OF_COLUMNS / 2);
+			int r_sqr = pixX * pixX + pixY * pixY;
+			int color = 255 * (1 + sin(2 * atan2(pixY, pixX) * 180 / M_PI / 1)) / 2; //Here we creating the lines
+			if (r_sqr < 400)
+			{
+				if (pixX * pixY >= 0)
+				{
+					image[row][column] = 0;
+				}
+				else
+				{
+					image[row][column] = 255;
+				}
+			}
+			else if (r_sqr < 13700)
+			{
+				image[row][column] = color;
+			}
+
+		}
+	}
+}
+
+
+void main()
+{
+	// Declare Gray Images
+	unsigned char TVtest[NUMBER_OF_ROWS][NUMBER_OF_COLUMNS];
+	
+	CreateTVtestImage(TVtest);
+
+	StoreGrayImageAsGrayBmpFile(TVtest, "TVtest.bmp");
+
+	WaitForUserPressKey();
+}
